@@ -4,7 +4,6 @@ import club.xtdf.node.tree.support.NodeFunction;
 import club.xtdf.node.tree.support.SerializedLambda;
 
 import java.io.*;
-import java.util.List;
 import java.util.Locale;
 
 /**
@@ -14,10 +13,6 @@ import java.util.Locale;
  * @author yangyi
  */
 public class NodeLambdaWrapper<T> implements Serializable {
-
-    public String getColumn(NodeFunction<T, ?> function) {
-        return deserialize(serialize(function)).getImplMethodName();
-    }
 
     /**
      * 方法名转字段名，直接copy mp的代码
@@ -40,6 +35,10 @@ public class NodeLambdaWrapper<T> implements Serializable {
         }
 
         return name;
+    }
+
+    public String getColumn(NodeFunction<T, ?> function) {
+        return deserialize(serialize(function)).getImplMethodName();
     }
 
     private SerializedLambda deserialize(byte[] bytes) {

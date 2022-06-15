@@ -1,14 +1,12 @@
 package club.xtdf.node.tree;
 
-import club.xtdf.node.tree.node.INode;
-import club.xtdf.node.tree.node.data;
 import club.xtdf.node.tree.pojo.User;
 import club.xtdf.node.tree.utils.ForestNodeMerger;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class Main {
+public class test {
     public static void main(String[] args) {
         long x = System.currentTimeMillis();
         System.out.println("user开始" + x);

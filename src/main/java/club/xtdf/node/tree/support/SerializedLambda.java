@@ -67,6 +67,30 @@ public class SerializedLambda implements Serializable {
     }
 
     /**
+     * 通过反序列化转换 lambda 表达式，该方法只能序列化 lambda 表达式，不能序列化接口实现或者正常非 lambda 写法的对象
+     *
+     * @param lambda lambda对象
+     * @return 返回解析后的 SerializedLambda
+     */
+    public static SerializedLambda resolve(NodeFunction<?, ?> lambda) {
+        if (!lambda.getClass().isSynthetic()) {
+            System.err.println("该方法仅能传入 lambda 表达式产生的合成类");
+        }
+        try (ObjectInputStream objIn = new ObjectInputStream(new ByteArrayInputStream(SerializationUtils.serialize(lambda))) {
+            @Override
+            protected Class<?> resolveClass(ObjectStreamClass objectStreamClass) throws IOException, ClassNotFoundException {
+                Class<?> clazz = super.resolveClass(objectStreamClass);
+                return clazz == SerializedLambda.class ? SerializedLambda.class : clazz;
+            }
+        }) {
+            return (SerializedLambda) objIn.readObject();
+        } catch (ClassNotFoundException | IOException e) {
+            System.err.println("This is impossible to happen");
+        }
+        return null;
+    }
+
+    /**
      * Get the name of the class that captured this lambda.
      *
      * @return the name of the class that captured this lambda
@@ -181,30 +205,6 @@ public class SerializedLambda implements Serializable {
     public String toString() {
         String implKind = MethodHandleInfo.referenceKindToString(implMethodKind);
         return String.format("SerializedLambda[%s=%s, %s=%s.%s:%s, " + "%s=%s %s.%s:%s, %s=%s, %s=%d]", "capturingClass", capturingClass, "functionalInterfaceMethod", functionalInterfaceClass, functionalInterfaceMethodName, functionalInterfaceMethodSignature, "implementation", implKind, implClass, implMethodName, implMethodSignature, "instantiatedMethodType", instantiatedMethodType, "numCaptured", capturedArgs.length);
-    }
-
-    /**
-     * 通过反序列化转换 lambda 表达式，该方法只能序列化 lambda 表达式，不能序列化接口实现或者正常非 lambda 写法的对象
-     *
-     * @param lambda lambda对象
-     * @return 返回解析后的 SerializedLambda
-     */
-    public static SerializedLambda resolve(NodeFunction<?, ?> lambda) {
-        if (!lambda.getClass().isSynthetic()) {
-            System.err.println("该方法仅能传入 lambda 表达式产生的合成类");
-        }
-        try (ObjectInputStream objIn = new ObjectInputStream(new ByteArrayInputStream(SerializationUtils.serialize(lambda))) {
-            @Override
-            protected Class<?> resolveClass(ObjectStreamClass objectStreamClass) throws IOException, ClassNotFoundException {
-                Class<?> clazz = super.resolveClass(objectStreamClass);
-                return clazz == SerializedLambda.class ? SerializedLambda.class : clazz;
-            }
-        }) {
-            return (SerializedLambda) objIn.readObject();
-        } catch (ClassNotFoundException | IOException e) {
-            System.err.println("This is impossible to happen");
-        }
-        return null;
     }
 
 }
