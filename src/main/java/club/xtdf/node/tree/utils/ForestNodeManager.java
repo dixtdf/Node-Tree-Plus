@@ -62,7 +62,6 @@ public class ForestNodeManager<T> {
         return node.get(in);
     }
 
-
     /**
      * 增加父节点ID
      *
